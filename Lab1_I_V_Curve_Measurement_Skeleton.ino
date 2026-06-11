@@ -1,21 +1,21 @@
 #include "Arduino.h"
 
-#define Vin 12 //*** Define the GPIO pin 12 as Vin ***
-#define Vout 27  //*** Define the GPIO pin 27 as Vout ***
-//#define Cal //*** Define the GPIO pin 14 as the node for current calcultion ***
+#define Vin 12    //*** Define the GPIO pin 12 as Vin ***
+#define Vout 27   //*** Define the GPIO pin 27 as Vout ***
+#define Vr2 14    //*** Define the GPIO pin 14 as the node for current calcultion ***
 
 //float R = ; //*** Resistance in Mohm ***
 
 //float x;
 //float y;
-// float c;
+//float c;
 
 void setup() {
 
   Serial.begin(115200); //*** Define the data rate as 115200 ***
   pinMode(Vin, OUTPUT); //*** Set Vin as OUTPUT ***
   pinMode(Vout, INPUT); //*** Set Vout as INPUT ***
-  // pinMode(Cal, ); //*** Set Cal as INPUT ***
+  pinMode(Vr2, INPUT); //*** Set Vr2 as INPUT ***
   
   delay(100);   //*** Set 100 ms delay ***
   //This task only needs to be done once, thus it is placed in setup().
@@ -23,24 +23,27 @@ void setup() {
   Serial.println("");
   Serial.println("### Start ###"); // display duty cycle,Vout for TASK 1 or I,Vout for Task 2 3 4
 
-  for (float onPeriod = 0; onPeriod < 256; onPeriod++) 
+  for (int onPeriod = 0; onPeriod < 256; onPeriod++) 
     {
     
     analogWrite(Vin,onPeriod);// Output PWM at Vin
 
-    float Vout_value = analogRead(Vout); // read the voltage level at Vout 
+    float Vout_value = analogRead(Vout);  // read the voltage level at Vout 
+    float Vr2_value = analogRead(Vr2);    // read the voltage level at Vr2 
 
     // int c_value = analogRead(); // read the voltage level at the node for current calcultion  
     // c=  ;//calculate the voltage at the node for current calcultion 
     // TASK 1 
-    float x =  onPeriod/255; // calculate duty cycle for TASK 1 or the voltage at Vout in mV for Task 2 3 4
-    float y =  Vout_value * 3.3/4095; // calculate the voltage at Vout in V for TASK 1 or current in uA for Task 2 3 4
+    //float x =  onPeriod/255; // calculate duty cycle for TASK 1 or the voltage at Vout in mV for Task 2 3 4
+    //float y =  Vout_value * 3.3/4095; // calculate the voltage at Vout in V for TASK 1 or current in uA for Task 2 3 4
+    // TASK 2
+    float x =  Vout_value * 3.3/4095; // calculate the voltage at Vout in V for TASK 1 or current in uA for Task 2 3 4
+    float y =  ((Vr2_value-Vout_value) * 3.3/4095)/22000; // calculate current of R2 and R3 (same current)
  
-    Serial.print(x); 
+    Serial.print(x, 6); 
     Serial.print(","); // seperate values by comma 
-    Serial.println(y);
+    Serial.println(y, 6);
 
-    //delay(20);
   }
 
   Serial.println("### End ###");
@@ -52,4 +55,5 @@ void loop() {
   // Code for continuous operation can be added here
   
 }
+
 //git commit -m "Initial commit
